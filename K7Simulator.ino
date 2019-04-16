@@ -7,7 +7,7 @@
 #include <Joystick.h>			// Makes the PC see the Arduino as a games controller
 #include <Wire.h>				// I2C bus
 #include "MPU6050.h"			// Control the MPU6050
-#include "FasLED.h"				// For the status LEDs
+#include <FastLED.h>				// For the status LEDs
 
 // CONSTANTS
 #define PIN_AIRBRAKE        A0
@@ -33,7 +33,7 @@
 #define PIN_BUTTON6			13
 
 // PINs
-#define PIN_LED
+#define PIN_LED				14
 
 // Others
 #define BUTTON_NO			7
@@ -43,15 +43,17 @@
 // GLOBAL VARIABLES
 uint8_t   debug = true;
 
-Joystick_ Joystick(JOYSTICK_DEFAULT_REPORT_ID, JOYSTICK_TYPE_JOYSTICK, 7, 0,
-	true, true, true, false, false, false, true, false, false, true, false);
+Joystick_	oJoystick(JOYSTICK_DEFAULT_REPORT_ID, JOYSTICK_TYPE_JOYSTICK, 7, 0, true, true, true, false, false, false, true, false, false, true, false);
+
+// MPU6050 sensor
+MPU6050		oMPU6050(Wire);
 
 //LED oLED[LED_NO];
-//Unit8_t iLEDBrightness;
+Unit8_t iLEDBrightness;
 //
-//MPU6050 sensor
 //Button status
 //LEDs
+
 //Potentiometer values
 //Reed switch / Hall effect sensor value(cable release)
 
@@ -63,6 +65,8 @@ void setup() {
 	//Start the Serial bus
 	//Start the I2C bus
 	//Initialise the MPU6050 + calibration
+	oMPU6050.begin();
+	oMPU6050.calcGyroOffsets(true);
 	//Setup PINs
 	//Initialise button variables
 	//Initialise button interrupt(s)
@@ -100,30 +104,23 @@ void setup() {
 // the loop function runs over and over again until power down or reset
 void loop() {
 	// Get MPU6050 axes values
+	oMPU6050.update();
 	// Set Joystick axes values
+	// Calculate x angle as a value from 0 = 1024
+	oJoystick.setXAxis(512);
+	oJoystick.setYAxis(512);
+	oJoystick.setZAxis(512);
 	// Get air brakes value
 	// Get rudder value
 	// Get trim value
 	// Set joystick air brakes value
+	Joystick.setBrake(512);
 	// Set joystick rudder value
+	oJoystick.setRudder(512);
 	// Set joystick trim value
 	// Check buttons
 	// Set joystick button values
 	// Set LED values
-
-	// Setup MPU-6050
-	delay(500);
-	Serial.println("Hello");
-
-	// Read from MPU and set Joystick
-	Joystick.setXAxis(512);
-	Joystick.setYAxis(512);
-	Joystick.setZAxis(512);
-	Joystick.setRudder(512);
-	Joystick.setBrake(512);
-
-	delay(10);
-
 }
 
 getPotentiometer(int iPIN, int iMaxValue) {
