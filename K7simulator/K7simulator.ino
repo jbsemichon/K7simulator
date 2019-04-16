@@ -4,32 +4,48 @@
  Author:	Endeavour ESU
 */
 
-#include "JoystickLibrary.h"	// Makes the PC see the Arduino as a games controller
+#include <Joystick.h>			// Makes the PC see the Arduino as a games controller
 #include <Wire.h>				// I2C bus
 #include "MPU6050.h"			// Control the MPU6050
 #include "FasLED.h"				// For the status LEDs
 
 // CONSTANTS
+#define PIN_AIRBRAKE        A0
+#define PIN_RUDDER          A1
+#define PIN_TRIM            A2
+
+#define PIN_CABLERELEASE    0
+
+#define PIN_SWITCH0         7
+#define PIN_SWITCH1         8
+#define PIN_SWITCH2         9
+#define PIN_SWITCH3         10
+#define PIN_SWITCH4         11
+#define PIN_SWITCH5         12
+#define PIN_SWITCH6         13
+
+#define	PIN_BUTTON0			7
+#define PIN_BUTTON1			8
+#define PIN_BUTTON2			9
+#define PIN_BUTTON3			10
+#define PIN_BUTTON4			11
+#define PIN_BUTTON5			12
+#define PIN_BUTTON6			13
+
 // PINs
-#define PIN_CABLERELEASE
-#define PIN_AIRBRAKES
-#define PIN_RUDDER
-#define PIN_TRIM
-#define PIN_BUTTON0
-#define PIN_BUTTON1
-#define PIN_BUTTON2
-#define PIN_BUTTON3
-#define PIN_BUTTON4
-#define PIN_BUTTON5
-#define PIN_BUTTON6
 #define PIN_LED
 
 // Others
-#define BUTTON_NO 7
-#define LED_NO 8
-#define I2C_ADDR_MPU6050
+#define BUTTON_NO			7
+#define LED_NO				8
+#define I2C_ADDR_MPU6050	0x68
 
 // GLOBAL VARIABLES
+uint8_t   debug = true;
+
+Joystick_ Joystick(JOYSTICK_DEFAULT_REPORT_ID, JOYSTICK_TYPE_JOYSTICK, 7, 0,
+	true, true, true, false, false, false, true, false, false, true, false);
+
 //LED oLED[LED_NO];
 //Unit8_t iLEDBrightness;
 //
@@ -56,6 +72,29 @@ void setup() {
 	//Initialise joystick library
 	//Set ready status LED
 
+	if (debug == true) {
+		Serial.begin(38400);
+		Serial.println("K7 simulator starting.");
+		Serial.println("Setting PINs.");
+	}
+	pinMode(PIN_AIRBRAKE, INPUT);
+	pinMode(PIN_RUDDER, INPUT);
+	pinMode(PIN_TRIM, INPUT);
+
+	pinMode(PIN_CABLERELEASE, INPUT_PULLUP);
+	pinMode(PIN_SWITCH0, INPUT_PULLUP);
+	pinMode(PIN_SWITCH1, INPUT_PULLUP);
+	pinMode(PIN_SWITCH2, INPUT_PULLUP);
+	pinMode(PIN_SWITCH3, INPUT_PULLUP);
+	pinMode(PIN_SWITCH4, INPUT_PULLUP);
+	pinMode(PIN_SWITCH5, INPUT_PULLUP);
+	pinMode(PIN_SWITCH6, INPUT_PULLUP);
+
+	if (debug == true) {
+		Serial.println("Setting up Joystick.");
+	}
+	Joystick.begin(true);
+
 }
 
 // the loop function runs over and over again until power down or reset
@@ -71,6 +110,19 @@ void loop() {
 	// Check buttons
 	// Set joystick button values
 	// Set LED values
+
+	// Setup MPU-6050
+	delay(500);
+	Serial.println("Hello");
+
+	// Read from MPU and set Joystick
+	Joystick.setXAxis(512);
+	Joystick.setYAxis(512);
+	Joystick.setZAxis(512);
+	Joystick.setRudder(512);
+	Joystick.setBrake(512);
+
+	delay(10);
 
 }
 
