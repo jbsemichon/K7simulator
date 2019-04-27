@@ -4,10 +4,10 @@
  Author:	Endeavour ESU
 */
 
-#include <Joystick.h>			// Makes the PC see the Arduino as a games controller
-#include <Wire.h>				// I2C bus
-#include "MPU6050.h"			// Control the MPU6050
-#include <FastLED.h>				// For the status LEDs
+#include "Joystick.h"			// Makes the PC see the Arduino as a games controller
+#include "Wire.h"				// I2C bus
+#include "MPU6050_tockn.h"		// Control the MPU6050
+#include "FastLED.h"			// For the status LEDs
 
 // CONSTANTS
 #define PIN_AIRBRAKE        A0
@@ -43,13 +43,13 @@
 // GLOBAL VARIABLES
 uint8_t   debug = true;
 
-Joystick_	oJoystick(JOYSTICK_DEFAULT_REPORT_ID, JOYSTICK_TYPE_JOYSTICK, 7, 0, true, true, true, false, false, false, true, false, false, true, false);
+Joystick_	oJoystick(JOYSTICK_DEFAULT_REPORT_ID, JOYSTICK_TYPE_MULTI_AXIS, 7, 0, true, true, true, false, false, false, true, false, false, true, false);
 
 // MPU6050 sensor
 MPU6050		oMPU6050(Wire);
 
 //LED oLED[LED_NO];
-Unit8_t iLEDBrightness;
+uint8_t iLEDBrightness;
 //
 //Button status
 //LEDs
@@ -63,22 +63,24 @@ Unit8_t iLEDBrightness;
 // the setup function runs once when you press reset or power the board
 void setup() {
 	//Start the Serial bus
+	if (debug == true) {
+		Serial.begin(115200);
+		Serial.println("K7 simulator starting.");
+	}
 	//Start the I2C bus
 	//Initialise the MPU6050 + calibration
-	oMPU6050.begin();
-	oMPU6050.calcGyroOffsets(true);
+	// oMPU6050.begin();
+	// oMPU6050.calcGyroOffsets(true);
 	//Setup PINs
 	//Initialise button variables
 	//Initialise button interrupt(s)
 	//Initialise LED
 	//Initialise Potentiometers
 	//Initialise reed switch / hall effect sensor
-	//Initialise joystick library
+
 	//Set ready status LED
 
 	if (debug == true) {
-		Serial.begin(38400);
-		Serial.println("K7 simulator starting.");
 		Serial.println("Setting PINs.");
 	}
 	pinMode(PIN_AIRBRAKE, INPUT);
@@ -97,8 +99,15 @@ void setup() {
 	if (debug == true) {
 		Serial.println("Setting up Joystick.");
 	}
-	Joystick.begin(true);
 
+	//Initialise joystick library
+	  // Set Range Values
+	oJoystick.setXAxisRange(-127, 127);
+	oJoystick.setYAxisRange(-127, 127);
+	oJoystick.setZAxisRange(-127, 127);
+	oJoystick.setRudderRange(255, 0);
+	oJoystick.begin(true);
+	
 }
 
 // the loop function runs over and over again until power down or reset
@@ -107,26 +116,27 @@ void loop() {
 	oMPU6050.update();
 	// Set Joystick axes values
 	// Calculate x angle as a value from 0 = 1024
-	oJoystick.setXAxis(512);
-	oJoystick.setYAxis(512);
-	oJoystick.setZAxis(512);
+	oJoystick.setXAxis(12);
+	oJoystick.setYAxis(12);
+	oJoystick.setZAxis(12);
 	// Get air brakes value
 	// Get rudder value
 	// Get trim value
 	// Set joystick air brakes value
-	Joystick.setBrake(512);
+	oJoystick.setBrake(12);
 	// Set joystick rudder value
-	oJoystick.setRudder(512);
+	oJoystick.setRudder(12);
 	// Set joystick trim value
 	// Check buttons
 	// Set joystick button values
 	// Set LED values
+	delay(25);
 }
 
 getPotentiometer(int iPIN, int iMaxValue) {
-	Int iValue;
+	int iValue;
 
 	iValue = analogRead(iPIN); // 0-1023 (10 bits)
 	iValue = iValue / (1024 / iMaxValue);
-	Return(iValue);
+	return(iValue);
 }
